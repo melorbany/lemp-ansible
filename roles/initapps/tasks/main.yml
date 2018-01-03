@@ -1,0 +1,55 @@
+---
+- name: Create the projects directory.
+  file: group={{ groupname }} owner={{ username }} mode=755 state=directory path={{ projects_root }}
+
+- name: Create the web root directory.
+  file: group={{ groupname }} owner={{ username }} mode=755 state=directory path={{ web_root }}
+
+- name: Create the repos root directory.
+  file: group={{ groupname }} owner={{ username }} mode=755 state=directory path={{ repos_root }}
+
+# - name: Create web apps directories (repos)
+#   file: group={{ groupname }} owner={{ username }} mode=755 state=directory path={{ repos_root }}/{{ item }}.git
+#   with_items: "{{ apps }}"
+#   register: reposdirscreated
+
+- name: Create web apps directories (repos)
+  #file: group={{ groupname }} owner={{ username }} mode=755 state=directory path=
+  shell: git init --bare {{ repos_root }}/{{ item }}.git
+  with_items: "{{ apps }}"
+  register: reposinited
+
+- name: Copy Git post recieve hook file
+  template: src=post-receive dest={{ repos_root }}/{{ item }}.git/hooks/
+  with_items: "{{ apps }}"
+
+- name: Make post recieve hook file executable
+  file: path={{ repos_root }}/{{ item }}.git/hooks/post-receive state=touch mode="a+x"
+  with_items: "{{ apps }}"
+
+- name: Change permissions
+  shell: chown -R {{ username }}:{{ groupname }} {{ repos_root }}/{{ item }}.git
+  with_items: "{{ apps }}"
+
+- name: Create web apps directories (sites)
+  #shell: name={{ item }} state=present update_cache=true
+  #ction: shell echo {{item}}
+  file: group={{ groupname }} owner={{ username }} mode=755 state=directory path={{ web_root }}/{{ item }}
+  with_items: "{{ apps }}"
+  register: sitesdirscreated
+
+- name: Create Nginx config files
+  template: src=nginx-template dest=/etc/nginx/sites-available/{{ item }}.conf
+  with_items: "{{ apps }}"
+
+- name: Enable Nginx sites
+  file: src=/etc/nginx/sites-available/{{ item }}.conf dest=/etc/nginx/sites-enabled/{{ item }}.conf state=link
+  with_items: "{{ apps }}"
+# - debug: msg="{{item.item}}"
+#   with_items: task.results
+#   when: item.changed == True
+
+
+#  notify: restart php-fpm
+
+

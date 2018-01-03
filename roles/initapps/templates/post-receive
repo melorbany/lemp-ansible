@@ -1,0 +1,2 @@
+git --work-tree=/var/www/sites/{{ item }} --git-dir=/var/www/repos/{{ item }}.git checkout master -f
+~                                                                                                                      
