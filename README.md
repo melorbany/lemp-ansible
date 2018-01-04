@@ -1,6 +1,6 @@
 
-### lemp-ansiable
-(LEMP) Linux, NGINX, MySQL, &amp; PHP Ansiable Configuration
+### lemp-ansible
+Installin LEMP Stack  (Linux, NGINX, MySQL, &amp; PHP) using Ansible On linux Ubuntu
 
 
 
