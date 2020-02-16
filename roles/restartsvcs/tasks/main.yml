@@ -3,5 +3,5 @@
   service: name=nginx state=restarted
 
 - name: restart php-fpm
-  raw: service php7.0-fpm restart
+  raw: service php7.2-fpm restart
   sudo: true
