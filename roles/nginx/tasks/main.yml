@@ -9,7 +9,3 @@
   register: nginxinstalled
   notify:
    - start nginx
-
-# - name: Copy nginx configuration for wordpress
-#   template: src=default.conf dest=/etc/nginx/conf.d/default.conf
-#   notify: restart nginx
