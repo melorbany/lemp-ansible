@@ -1,65 +1,38 @@
 ---
-- name: PHP | Add php-7.2 PPA
-  apt_repository: repo='ppa:ondrej/php'
-                  state=present
-                  update_cache=yes
-  sudo: true
+- name: PHP | Install software-properties-common
+  ansible.builtin.apt:
+    name: software-properties-common
+    update_cache: yes
 
-- name: PHP | install php packages
-  apt: pkg={{ item }} state=installed
-  with_items:
-    - php7.2-fpm
-    - php7.2-cli
-    - php7.2-common
-    - php7.2-curl
-    - php7.2-json
-    - php7.2-gd
-    - php7.2-mcrypt
-    - php7.2-odbc
-    - php7.2-pgsql
-    - php7.2-mbstring
-    - php7.2-mysql
-    - php7.2-xmlrpc
-    - php7.2-opcache
-    - php7.2-intl
-    - php7.2-bz2
-    - php7.2-xml
-  sudo: true
+- name: PHP | Install PHP packages
+  ansible.builtin.apt:
+    name: "php{{ php_version }}-{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - fpm
+    - cli
+    - common
+    - curl
+    - gd
+    - odbc
+    - pgsql
+    - mbstring
+    - mysql
+    - xmlrpc
+    - opcache
+    - intl
+    - bz2
+    - xml
 
-- name: PHP | FPM php.ini
-  template:
-    src=php.ini.j2
-    dest=/etc/php/7.2/fpm/php.ini
-    backup=yes
-    owner=root
-    group=root
-    mode=0644
-  sudo: true
+- name: PHP | Ensure PHP-FPM is started and enabled
+  ansible.builtin.service:
+    name: "php{{ php_version }}-fpm"
+    state: started
+    enabled: yes
 
-- name: PHP | CLI php.ini
-  template:
-    src=php.ini.j2
-    dest=/etc/php/7.2/cli/php.ini
-    backup=yes
-    owner=root
-    group=root
-    mode=0644
-  sudo: true
-
-- name: PHP | configure opcache
-  template:
-    src=opcache.ini.j2
-    dest=/etc/php/7.2/mods-available/opcache.ini
-    backup=yes
-    owner=root
-    group=root
-    mode=0644
-  sudo: true
-
-- name: PHP | restart nginx
-  raw: service nginx restart
-  sudo: true
-
-- name: PHP | restart fpm
-  raw: service php7.2-fpm restart
-  sudo: true
+- name: PHP | Ensure nginx is started and enabled
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+    enabled: yes

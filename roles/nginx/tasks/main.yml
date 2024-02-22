@@ -1,11 +1,13 @@
 ---
-- name: Add Nginx Repository
-  apt_repository: repo='ppa:nginx/stable' state=present
-  register: nginxppastable
-
+- name: Add Nginx official repository key
+  apt_key:
+    url: https://nginx.org/keys/nginx_signing.key
+    state: present
+    
 - name: Install Nginx
-  apt: name=nginx state=present update_cache=true
-  when: nginxppastable|success
-  register: nginxinstalled
+  apt:
+    name: nginx
+    state: present
+    update_cache: true
   notify:
-   - start nginx
+    - start nginx

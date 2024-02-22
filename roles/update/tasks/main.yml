@@ -1,19 +1,23 @@
 
 ---
-- name: install python2
-  raw: sudo apt-get -y install python-simplejson
+- name: Install python for Ansible
+  raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3)
+  changed_when: false
 
-- name: install aptitude
-  raw: sudo apt-get -y install aptitude
+- name: Install aptitude using raw module
+  raw: test -e /usr/bin/aptitude || apt-get -y install aptitude
+  changed_when: false
 
-- name: apt-get | apt-get update
-  apt: update_cache=yes cache_valid_time=3600
-  sudo: true
+- name: Update apt cache if needed
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
 
-- name: apt-get | ensure core packages are installed
-  apt: pkg={{ item }} state=installed
-  sudo: true
-  with_items:
+- name: Ensure core packages are installed
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
     - atool
     - atop
     - htop
@@ -21,13 +25,13 @@
     - git
     - make
     - mc
-    - python-software-properties
+    - software-properties-common
     - supervisor
     - tig
     - tree
     - vim
     - unzip
 
-
-- name: Upgrade Server
-  apt: upgrade=full
+- name: Upgrade all packages to the latest version
+  apt:
+    upgrade: dist

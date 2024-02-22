@@ -1,64 +1,69 @@
 ---
 - name: MySQL | install mysql packages
-  apt: pkg={{ item }} state=installed
-  sudo: true
+  apt:
+    name: "{{ item }}"
+    state: present
+  become: yes
   with_items:
-   - mysql-client
-   - mysql-common
-   - mysql-server
-   - python-mysqldb
+    - mysql-client
+    - mysql-common
+    - mysql-server
 
-- name: MySQL | create MySQL configuration file
-  template:
-    src=my.cnf.j2
-    dest=/etc/mysql/my.cnf
-    backup=yes
-    owner=root
-    group=root
-    mode=0644
-  sudo: true
+
+- name: Install python3-pymysql
+  apt:
+    name: 
+      - python3-pymysql
+    state: present
+  become: yes
 
 - name: MySQL | restart mysql
-  service: name=mysql state=restarted
-  sudo: true
+  service:
+    name: mysql
+    state: restarted
+  become: yes
 
-# MySQL database setup, this does the equivalent of mysql_secure_installation.
-- name: MySQL | Set the root password.
-  mysql_user: name=root password={{ mysql_root_password }} host=localhost
-  sudo: true
+# - name: MySQL | Set MySQL root password
+#   mysql_user:
+#     name: root
+#     password: ""
+#     host_all: yes
+#     check_implicit_admin: true
+#   become: yes
 
-- name: MySQL | Config for easy access as root user
-  template: src=mysql_root.my.cnf.j2 dest=/root/.my.cnf
-  sudo: true
+# - name: MySQL | Delete anonymous MySQL server user
+#   mysql_user:
+#     name: ""
+#     host_all: yes
+#     state: absent
+#     login_user: root
+#     login_password: "{{ mysql_root_password }}"
+#   become: yes
 
-- name: MySQL | Config for easy access as root user
-  template: src=mysql_root.my.cnf.j2 dest={{ home_dir }}/.my.cnf
-  when: "'{{ user }}' != 'root'"
+# - name: MySQL | Secure the MySQL root user for all hosts
+#   mysql_user:
+#     name: root
+#     password: "{{ mysql_root_password }}"
+#     host_all: yes
+#     login_user: root
+#     login_password: "{{ mysql_root_password }}"
+#   become: yes
 
-- name: MySQL | Delete anonymous MySQL server user for {{ server_hostname }}
-  mysql_user: name="" host="{{ server_hostname }}" state="absent" login_user=root login_password={{ mysql_root_password }}
+# - name: MySQL | Remove the MySQL test database
+#   mysql_db:
+#     name: test
+#     state: absent
+#     login_user: root
+#     login_password: "{{ mysql_root_password }}"
+#   become: yes
 
-- name: MySQL | Delete anonymous MySQL server user for localhost
-  mysql_user: name="" state="absent" host=localhost login_user=root login_password={{ mysql_root_password }}
-
-- name: MySQL | Secure the MySQL root user for IPV6 localhost (::1)
-  mysql_user: name="root" password="{{ mysql_root_password }}" host="::1" login_user=root login_password={{ mysql_root_password }}
-
-- name: MySQL | Secure the MySQL root user for IPV4 localhost (127.0.0.1)
-  mysql_user: name="root" password="{{ mysql_root_password }}" host="127.0.0.1" login_user=root login_password={{ mysql_root_password }}
-
-- name: MySQL | Secure the MySQL root user for localhost domain (localhost)
-  mysql_user: name="root" password="{{ mysql_root_password }}" host="localhost" login_user=root login_password={{ mysql_root_password }}
-
-- name: MySQL | Secure the MySQL root user for {{ server_hostname }} domain
-  mysql_user: name="root" password="{{ mysql_root_password }}" host="{{ server_hostname }}" login_user=root login_password={{ mysql_root_password }}
-
-- name: MySQL | Remove the MySQL test database
-  mysql_db: db=test state=absent login_user=root login_password={{ mysql_root_password }}
-
-- name: MySQL | create application database user
-  mysql_user: name={{ dbuser }} password={{ dbpass }} priv=*.*:ALL host='%' state=present login_password={{ mysql_root_password }} login_user=root
-
-- name: MySQL | restart mysql
-  service: name=mysql state=restarted
-  sudo: true
+# - name: MySQL | create application database user
+#   mysql_user:
+#     name: "{{ mysql_app_user }}"
+#     password: "{{ mysql_app_password }}"
+#     priv: "*.*:ALL"
+#     host: '%'
+#     state: present
+#     login_user: root
+#     login_password: "{{ mysql_root_password }}"
+#   become: yes
