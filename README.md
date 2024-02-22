@@ -1,11 +1,28 @@
+# LEMP Stack Ansible Playbook
+Quickly install and configure the LEMP stack (Linux, Nginx, MySQL, PHP) on Ubuntu servers using this Ansible playbook.
 
-### lemp-ansible
-Installin LEMP Stack  (Linux, NGINX, MySQL, &amp; PHP) using Ansible On linux Ubuntu
+## Prerequisites
+Ansible on your control machine
+SSH access with sudo privileges on your Ubuntu server
 
+## Setup
+Update your inventory in the hosts file with your server's IP.
+Configure necessary variables in group_vars/all.
 
+## Usage
+Run the playbook with:
 
-### How to use ?
-ansible-playbook -i hosts site.yml --user=USER --extra-vars "ansible_sudo_pass=PASSWORD"
+`ansible-playbook -i hosts site.yml`
 
+## Roles
+update: System update
+common: Basic tools
+nginx: Nginx server
+php: PHP and extensions
+mysql: MySQL database
+initapps: Application setup
+restartsvcs: Service restarts
+Customize site.yml to include or exclude specific roles as needed.
 
-ansible-playbook -i hosts site.yml
+## Support
+For issues and enhancements, please open a GitHub issue.
