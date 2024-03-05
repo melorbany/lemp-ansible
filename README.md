@@ -1,4 +1,4 @@
-# LEMP Stack Ansible Playbook
+# Ansible for LEMP Stack (Linux, Nginx, MySQL, PHP)
 Quickly install and configure the LEMP stack (Linux, Nginx, MySQL, PHP) on Ubuntu servers using this Ansible playbook.
 
 ## Prerequisites
